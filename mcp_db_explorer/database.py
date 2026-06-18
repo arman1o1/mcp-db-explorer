@@ -48,13 +48,26 @@ class DatabaseManager:
 
         # Normalize connection string and db_type
         if db_type == "sqlite":
-            # Strip sqlite: and file: prefixes and any leading slashes cleanly
-            clean_conn = re.sub(
-                r"^sqlite:/{0,4}", "", connection_string, flags=re.IGNORECASE
-            )
-            clean_conn = re.sub(r"^file:/{0,4}", "", clean_conn, flags=re.IGNORECASE)
             # Strip any query parameters to prevent parameter injection
-            clean_conn = clean_conn.split("?")[0]
+            clean_conn = connection_string.split("?")[0]
+
+            # Strip sqlite: and file: prefixes case-insensitively
+            # Check 3-slash forms first to preserve leading slashes correctly on Unix absolute paths
+            lower_conn = clean_conn.lower()
+            if lower_conn.startswith("sqlite:///"):
+                clean_conn = clean_conn[10:]
+            elif lower_conn.startswith("sqlite://"):
+                clean_conn = clean_conn[9:]
+            elif lower_conn.startswith("sqlite:"):
+                clean_conn = clean_conn[7:]
+
+            lower_conn = clean_conn.lower()
+            if lower_conn.startswith("file:///"):
+                clean_conn = clean_conn[8:]
+            elif lower_conn.startswith("file://"):
+                clean_conn = clean_conn[7:]
+            elif lower_conn.startswith("file:"):
+                clean_conn = clean_conn[5:]
 
             # If in-memory
             if clean_conn == ":memory:":
