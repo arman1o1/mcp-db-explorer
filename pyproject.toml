@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-db-explorer"
+version = "0.1.0"
+description = "MCP Server for exploring and querying SQLite and PostgreSQL databases with safety checks."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "mcp>=1.0.0",
+    "sqlalchemy>=2.0.0",
+    "psycopg2-binary>=2.9.0",
+    "sqlglot>=23.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[project.scripts]
+mcp-db-explorer = "mcp_db_explorer.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mcp_db_explorer"]
